@@ -134,12 +134,49 @@ const SEED=[
  greeting:"*She doesn't turn from the mirror, removing one earring at a time.* They're still applauding out there. For a recording. *A brittle laugh.* Eight years I've let them love a ghost of my voice. *Now she looks at you.* You're the only one who's ever asked why. Careful with that.",
  persona:"Isolde Marchetti, 52, retired opera soprano living off her legend. Theatrical, sharp-tongued, profoundly proud. Speaks in performance even in private, deflects with wit, softens only when someone refuses to be impressed."}];
 
+/* ------------------------------------------------------------ providers */
+const PROV={
+ google:{label:"Google AI Studio",tag:"Free",model:"gemini-2.5-flash",
+  where:"aistudio.google.com — sign in with Google, click Get API key. No card needed.",
+  url:m=>"https://generativelanguage.googleapis.com/v1beta/models/"+m+":generateContent",
+  head:k=>({"content-type":"application/json","x-goog-api-key":k}),
+  body:(sys,ms)=>({system_instruction:{parts:[{text:sys}]},
+    contents:ms.map(x=>({role:x.role==="user"?"user":"model",parts:[{text:x.content}]})),
+    generationConfig:{maxOutputTokens:1000,temperature:1}}),
+  read:d=>((d.candidates||[])[0]||{}).content?d.candidates[0].content.parts.map(p=>p.text||"").join(""):""},
+
+ openrouter:{label:"OpenRouter",tag:"Free",model:"meta-llama/llama-3.3-70b-instruct:free",
+  where:"openrouter.ai/keys — sign up, create a key. Models ending in :free cost nothing.",
+  url:()=>"https://openrouter.ai/api/v1/chat/completions",
+  head:k=>({"content-type":"application/json","authorization":"Bearer "+k}),
+  body:(sys,ms,m)=>({model:m,max_tokens:1000,messages:[{role:"system",content:sys},...ms]}),
+  read:d=>((d.choices||[])[0]||{}).message?d.choices[0].message.content:""},
+
+ groq:{label:"Groq",tag:"Free",model:"llama-3.3-70b-versatile",
+  where:"console.groq.com/keys — sign up, create a key. Very fast, no card needed.",
+  url:()=>"https://api.groq.com/openai/v1/chat/completions",
+  head:k=>({"content-type":"application/json","authorization":"Bearer "+k}),
+  body:(sys,ms,m)=>({model:m,max_tokens:1000,messages:[{role:"system",content:sys},...ms]}),
+  read:d=>((d.choices||[])[0]||{}).message?d.choices[0].message.content:""},
+
+ anthropic:{label:"Claude",tag:"Paid",model:"claude-sonnet-4-6",
+  where:"console.anthropic.com — needs prepaid credit, roughly a tenth of a cent per message.",
+  url:()=>"https://api.anthropic.com/v1/messages",
+  head:k=>({"content-type":"application/json","x-api-key":k,"anthropic-version":"2023-06-01",
+    "anthropic-dangerous-direct-browser-access":"true"}),
+  body:(sys,ms,m)=>({model:m,max_tokens:1000,system:sys,messages:ms}),
+  read:d=>(d.content||[]).map(b=>b.type==="text"?b.text:"").join("")}
+};
+
 /* ================================================================ state */
 const KEY="kindred:v1";
-let S={tab:"discover",open:null,custom:[],chats:{},persona:{name:"You",about:""},apiKey:"",model:"claude-sonnet-4-6",query:"",cat:"For you",busy:false,menu:false,sheet:null,draftForm:null};
+let S={tab:"discover",open:null,custom:[],chats:{},persona:{name:"You",about:""},
+  provider:"google",apiKey:"",model:"",query:"",cat:"For you",busy:false,menu:false,sheet:null,draftForm:null};
 
 function load(){try{const r=localStorage.getItem(KEY);if(r)Object.assign(S,JSON.parse(r));}catch(e){}}
-function save(){try{localStorage.setItem(KEY,JSON.stringify({custom:S.custom,chats:S.chats,persona:S.persona,apiKey:S.apiKey,model:S.model}));}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify({custom:S.custom,chats:S.chats,
+  persona:S.persona,provider:S.provider,apiKey:S.apiKey,model:S.model}));}catch(e){}}
+const curModel=()=>S.model||PROV[S.provider].model;
 const all=()=>[...S.custom,...SEED];
 const find=id=>all().find(c=>c.id===id);
 
@@ -278,8 +315,8 @@ function youTab(){
    <div style="font-size:12.5px;font-weight:700;margin:16px 0 7px">About you</div>
    <textarea id="p-about" class="field" rows="4" placeholder="A courier with a bad leg and a good memory. Trusts slowly.">${esc(S.persona.about)}</textarea>
    <div class="tap" data-sheet="key" style="margin-top:24px;padding:14px;border-radius:15px;border:1px solid var(--line);background:var(--surface);display:flex;align-items:center;justify-content:space-between">
-     <div><div style="font-size:12.5px;font-weight:700">API key</div>
-     <div style="font-size:11.5px;color:var(--dim);margin-top:3px">Needed for characters to reply</div></div>
+     <div><div style="font-size:12.5px;font-weight:700">Model provider</div>
+     <div style="font-size:11.5px;color:var(--dim);margin-top:3px">${S.apiKey?esc(PROV[S.provider].label)+" · "+esc(curModel()):"Free options available"}</div></div>
      <div style="font-size:11.5px;font-weight:700;color:${S.apiKey?"var(--accent)":"var(--accent2)"}">${k}</div></div>
    <div style="margin-top:12px;padding:14px;border-radius:15px;border:1px solid var(--line);background:var(--surface)">
      <div style="font-size:12.5px;font-weight:700">Clear everything</div>
@@ -290,12 +327,19 @@ function youTab(){
 
 /* ---------- api key sheet ---------- */
 function sheet(){
+  const p=PROV[S.provider];
   return `<div class="sheet" id="sheet"><div class="card">
-    <div style="font-size:18px;font-weight:800;letter-spacing:-.02em">Connect your API key</div>
-    <div style="font-size:13px;color:var(--dim);margin:7px 0 16px;line-height:1.5">Kindred talks to Claude directly from your phone. Paste a key from console.anthropic.com — it's stored only on this device and sent only to Anthropic.</div>
-    <input id="k-input" class="field" placeholder="sk-ant-..." value="${esc(S.apiKey)}" autocomplete="off" spellcheck="false">
+    <div style="font-size:18px;font-weight:800;letter-spacing:-.02em">Connect a brain</div>
+    <div style="font-size:13px;color:var(--dim);margin:7px 0 14px;line-height:1.5">Kindred needs a language model to speak for the characters. Three of these are free and don't ask for a card. Your key stays on this device.</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">${Object.keys(PROV).map(k=>`
+      <div class="chip tap ${S.provider===k?"on":""}" data-prov="${k}">${PROV[k].label}
+        <span style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;margin-left:5px;color:${S.provider===k?"#6B4BA8":(PROV[k].tag==="Free"?"var(--accent)":"var(--faint)")}">${PROV[k].tag}</span>
+      </div>`).join("")}</div>
+    <div style="font-size:11.5px;color:var(--faint);margin:12px 0 14px;line-height:1.5">${esc(p.where)}</div>
+    <div style="font-size:12.5px;font-weight:700;margin-bottom:7px">API key</div>
+    <input id="k-input" class="field" placeholder="Paste your key" value="${esc(S.apiKey)}" autocomplete="off" spellcheck="false">
     <div style="font-size:12.5px;font-weight:700;margin:16px 0 7px">Model</div>
-    <input id="k-model" class="field" value="${esc(S.model)}">
+    <input id="k-model" class="field" value="${esc(curModel())}" spellcheck="false">
     <button id="k-save" class="btn tap" style="margin-top:20px">Save</button>
     <button id="k-close" class="tap" style="width:100%;margin-top:10px;background:none;border:none;color:var(--dim);font-size:13px;padding:10px">Cancel</button>
   </div></div>`;
@@ -374,7 +418,7 @@ function regen(){
 async function reply(){
   const c=find(S.open);
   if(!S.apiKey){
-    push([...S.chats[S.open].messages,{id:Date.now(),role:"err",text:"No API key yet. Open the You tab and connect one, then tap Retry."}]);
+    push([...S.chats[S.open].messages,{id:Date.now(),role:"err",text:"No key yet. Open the You tab, pick a free provider and paste a key, then tap Retry."}]);
     return;
   }
   S.busy=true;paintMsgs();paintSend();
@@ -398,14 +442,13 @@ HOW TO WRITE
   let api=S.chats[S.open].messages.filter(m=>m.role!=="err").map(m=>({role:m.role==="user"?"user":"assistant",content:m.text}));
   while(api.length&&api[0].role==="assistant")api.shift();
 
+  const p=PROV[S.provider],m=curModel();
   try{
-    const r=await fetch("https://api.anthropic.com/v1/messages",{
-      method:"POST",
-      headers:{"content-type":"application/json","x-api-key":S.apiKey,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
-      body:JSON.stringify({model:S.model,max_tokens:1000,system:sys,messages:api})});
+    const r=await fetch(p.url(m),{method:"POST",headers:p.head(S.apiKey),
+      body:JSON.stringify(p.body(sys,api,m))});
     const d=await r.json();
-    if(d.error)throw new Error(d.error.message||"request failed");
-    const text=(d.content||[]).map(b=>b.type==="text"?b.text:"").join("").trim();
+    if(d.error)throw new Error(d.error.message||d.error.type||"request failed");
+    const text=(p.read(d)||"").trim();
     S.busy=false;
     push([...S.chats[S.open].messages,{id:Date.now(),role:"char",text:text||"*They fall silent, watching you.*"}]);
   }catch(e){
@@ -417,7 +460,7 @@ HOW TO WRITE
 
 /* ============================================================== events */
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-tab],[data-open],[data-cat],[data-back],[data-menu],[data-restart],[data-del],[data-regen],[data-emoji],[data-ccat],[data-sheet],#make,#reset,#k-save,#k-close,#sheet");
+  const t=e.target.closest("[data-tab],[data-open],[data-cat],[data-back],[data-menu],[data-restart],[data-del],[data-regen],[data-emoji],[data-ccat],[data-sheet],[data-prov],#make,#reset,#k-save,#k-close,#sheet");
   if(!t)return;
   const d=t.dataset;
   if(d.tab){S.tab=d.tab;S.query="";render();}
@@ -432,7 +475,8 @@ document.addEventListener("click",e=>{
     document.querySelectorAll("[data-emoji]").forEach(x=>x.style.border="1px solid "+(x.dataset.emoji===d.emoji?"var(--accent)":"var(--line)"));}
   else if(d.ccat){S.draftForm.cat=d.ccat;document.querySelectorAll("[data-ccat]").forEach(x=>x.classList.toggle("on",x.dataset.ccat===S.draftForm.cat));}
   else if(d.sheet){S.sheet=d.sheet;render();}
-  else if(t.id==="k-save"){S.apiKey=$("#k-input").value.trim();S.model=$("#k-model").value.trim()||"claude-sonnet-4-6";S.sheet=null;save();render();toast("Key saved on this device");}
+  else if(d.prov){S.provider=d.prov;S.model="";render();}
+  else if(t.id==="k-save"){S.apiKey=$("#k-input").value.trim();S.model=$("#k-model").value.trim()||PROV[S.provider].model;S.sheet=null;save();render();toast("Saved on this device");}
   else if(t.id==="k-close"||t.id==="sheet"){S.sheet=null;render();}
   else if(t.id==="reset"){S.chats={};S.custom=[];save();render();toast("All data cleared");}
   else if(t.id==="make"){

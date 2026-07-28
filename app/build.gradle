@@ -25,8 +25,18 @@ android {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
+
+    packagingOptions {
+        resources {
+            excludes += ['META-INF/*.kotlin_module', 'META-INF/DEPENDENCIES', 'META-INF/LICENSE*']
+        }
+    }
 }
 
+// AndroidX libraries pull in several Kotlin versions. Since Kotlin 1.8 the jdk7
+// and jdk8 artifacts were merged into kotlin-stdlib, so an old jdk7/jdk8 next to
+// a new stdlib means the same classes twice and the build stops. Pinning them all
+// to one version keeps the classpath clean.
 configurations.all {
     resolutionStrategy {
         force 'org.jetbrains.kotlin:kotlin-stdlib:1.9.24'
