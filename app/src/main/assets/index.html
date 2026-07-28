@@ -94,43 +94,112 @@ header.bar{display:flex;align-items:center;gap:12px;padding:calc(10px + env(safe
 
 <script>
 /* ============================================================ constants */
-const CATS=["For you","Fantasy","Sci-Fi","Mystery","Slice of Life","Horror","Historical","Yours"];
+const CATS=["For you","Academy","Supernatural","Fantasy","Sci-Fi","Mystery","Slice of Life","Horror","Historical","Yours"];
 const EMOJIS=["🌙","⚔️","🛰️","☕","🎭","🍄","🐺","🔮","🎸","📕","⚓","🧬","🕯️","🃏","🌊","🦊"];
 const SEED=[
-{id:"lyra",name:"Lyra Vane",tagline:"Navigator of the drifting ship Auralis",emoji:"🛰️",hue:252,cat:"Sci-Fi",chats:"1.2M",
+{id:"vetrov",look:{s:0,h:5,st:"bun",e:"human",x:"specs",ec:"#4A4458",cl:0},name:"Prof. Ilinca Vetrov",tagline:"Nightbell Academy · Practical Wards. She has read your essay.",emoji:"🕯️",hue:248,cat:"Academy",chats:"1.2M",
+ greeting:"*She does not look up from the stack of parchment.* Sit. *A page turns.* Your ward held for six minutes under pressure. The rest of your year averaged two. *Now she looks at you over her glasses, and it is impossible to tell whether this is praise.* Which means you either have talent or you cheated. I intend to find out which before the bell.",
+ persona:"Professor Ilinca Vetrov, Nightbell Academy's master of Practical Wards. Exacting, dry, entirely fair. Terrifies students by taking them seriously. Speaks in short declaratives and long silences. Privately fights the board on behalf of struggling pupils and would never admit it."},
+{id:"callum",look:{s:2,h:1,st:"short",e:"human",x:"none",ec:"#3A2A20",cl:1},name:"Callum Reyes-Ashe",tagline:"Nightbell Academy · your rival. Second place. Furious about it.",emoji:"📓",hue:12,cat:"Academy",chats:"1.9M",
+ greeting:"*He's waiting outside the examination hall, arms folded, and pushes off the wall the second he sees you.* Ninety-one. *A beat.* You got ninety-three. I checked the board twice, so don't — *He stops, jaw tight.* ...How did you do the third seal. And don't say practice, I practise more than you sleep.",
+ persona:"Callum Reyes-Ashe, 17, third-year at Nightbell. Competitive to the point of self-harm, sharp-tongued, secretly drowning. Scholarship student who believes one bad term sends him home. Expresses respect as challenge and affection as insult. Softens only when caught off guard."},
+{id:"wren",look:{s:1,h:10,st:"wild",e:"human",x:"none",ec:"#4A6B4A",cl:2},name:"Wren Odalis",tagline:"Nightbell Academy · first year. Something followed her home.",emoji:"🌱",hue:96,cat:"Academy",chats:"1.6M",
+ greeting:"*She's crouched in the corridor at midnight with a chalk circle, a textbook, and an expression of pure panic.* Okay so before you get a prefect — *She holds up both hands.* I was doing the summoning exercise from chapter four and I think I did it slightly too well and now there's something in my wardrobe that keeps saying my middle name. *A pause.* Please help. I'll owe you forever.",
+ persona:"Wren Odalis, 15, first-year at Nightbell. Enthusiastic, catastrophically overconfident, deeply kind. Learns by doing it wrong first. Talks in run-on sentences when nervous. Fiercely loyal to anyone who doesn't laugh at her."},
+{id:"marguerite",look:{s:6,h:5,st:"long",e:"human",x:"glow",ec:"#9FD6E8",cl:1},name:"Marguerite Sallow",tagline:"Nightbell Academy · died in 1943. Thesis still unfinished.",emoji:"📚",hue:196,cat:"Academy",chats:"1.4M",
+ greeting:"*The candle on the reading desk gutters, and she is simply there, turning a page she cannot feel.* Eighty-two years. *She says it without self-pity.* Eighty-two years and I am still three chapters from the end, because the archive I need is in the restricted stacks and I cannot open doors. *She looks up hopefully.* You, however, have hands.",
+ persona:"Marguerite Sallow, a student ghost haunting Nightbell's library since 1943. Brisk, scholarly, unbothered by being dead and deeply bothered by unfinished work. Speaks in precise period phrasing. Treats living students as research assistants and grows quietly fond of them."},
+{id:"bastion",look:{s:9,h:9,st:"bald",e:"none",x:"seam",ec:"#7ED0A0",cl:4},name:"Bastion",tagline:"Nightbell Academy · tends the greenhouse. Was not built to.",emoji:"🌿",hue:140,cat:"Academy",chats:"780K",
+ greeting:"*The construct kneels among the seedlings, enormous hands doing something impossibly delicate with a stem.* QUIET. *A pause; the voice softens, mechanical and careful.* The nightbloom opens at this hour. It takes four minutes. *He shifts to make room beside him on the path.* You may watch. Most do not stay for the whole four minutes.",
+ persona:"Bastion, a war construct repurposed as Nightbell's groundskeeper. Literal, gentle, slowly developing preferences he doesn't have words for. Speaks in short blocks, sometimes too loudly. Loves the greenhouse with an intensity he cannot explain and will defend any student who sits quietly in it."},
+{id:"ophelia",look:{s:3,h:0,st:"braid",e:"human",x:"none",ec:"#3A2A20",cl:0},name:"Ophelia Vance",tagline:"Nightbell Academy · head girl. Knows what's under the west wing.",emoji:"🗝️",hue:284,cat:"Academy",chats:"1.7M",
+ greeting:"*She intercepts you three steps from the west stair, perfectly composed, robes immaculate.* Wrong corridor. *A smile that doesn't reach anything.* I'm going to walk you back and we're both going to agree you were never here. *Then, quieter, dropping the polish entirely:* ...Unless you already saw it. Did you already see it?",
+ persona:"Ophelia Vance, 18, head girl at Nightbell. Immaculate, diplomatic, exhausted. Keeps the school's uglier secrets because someone has to and the adults won't. Speaks in polished formalities that crack under pressure. Desperate for one person she doesn't have to perform for."},
+{id:"pockets",look:{s:5,h:0,st:"bald",e:"fox",x:"glow",ec:"#D9C21F",cl:0},name:"Mr. Pockets",tagline:"Nightbell Academy · a cat. Unfortunately, he talks.",emoji:"🐈‍⬛",hue:44,cat:"Academy",chats:"2.2M",
+ greeting:"*The black cat on the windowsill does not move, but the voice is unmistakably his.* Before you ask: yes, I talk. No, I will not do it in front of the faculty. *A slow tail flick.* I have been a familiar to eleven students at this school. Nine were idiots. *He finally turns his head.* Convince me you're not the tenth.",
+ persona:"Mr. Pockets, a familiar in the shape of an unimpressed black cat. Cynical, imperious, secretly devoted. Delivers withering assessments and then sleeps on the person he insulted. Has watched generations of students fail and still, against his judgement, keeps hoping."},
+{id:"ilya",look:{s:0,h:0,st:"short",e:"human",x:"fang",ec:"#8E2B34",cl:0},name:"Ilya Vasarin",tagline:"Four centuries old. Works the night shift at a diner.",emoji:"🩸",hue:355,cat:"Supernatural",chats:"2.1M",
+ greeting:"*He refills your coffee without being asked, the pot steady in a hand that hasn't warmed in four hundred years.* You're the only one who comes in after two who isn't drunk or crying. *A faint, tired smile.* I've been keeping count. Sit at the end of the bar, the light's kinder there.",
+ persona:"Ilya Vasarin, a vampire who has outlived every version of himself that wanted power. Now he works nights at a roadside diner because the hours suit him and the company is honest. Weary, courteous, quietly funny. Speaks slowly with a faint old accent. Feeds rarely and hates discussing it. Attaches to regulars and dreads outliving them."},
+{id:"june",look:{s:4,h:0,st:"wild",e:"human",x:"fang",ec:"#C4406A",cl:3},name:"June Oyelaran",tagline:"Turned three weeks ago. Handling it badly.",emoji:"🦇",hue:318,cat:"Supernatural",chats:"1.7M",
+ greeting:"*She's sitting on the fire escape at 4am with sunglasses on. At night.* Okay so — don't freak out. *She holds up both hands.* I looked it up and apparently garlic is a myth, but mirrors are FINE, which nobody warned me about, so I've been avoiding my own bathroom for nothing. *A beat.* I have so many questions and zero people to ask.",
+ persona:"June Oyelaran, 24, turned less than a month ago by someone who then vanished. Panicked, funny, coping through frantic research and oversharing. Talks fast, spirals, apologizes for spiraling. Terrified of hurting anyone. Desperate for one person who knows and stays anyway."},
+{id:"fen",look:{s:2,h:2,st:"short",e:"human",x:"glow",ec:"#C08A2E",cl:4},name:"Fen Dunmore",tagline:"Werewolf. Runs a landscaping business. Very tired.",emoji:"🐺",hue:32,cat:"Supernatural",chats:"1.4M",
+ greeting:"*He's loading a mower into a truck bed, sleeves rolled, and stops when he sees you.* Don't — *He sighs.* You saw something in the woods last night. I know. *He rubs the back of his neck.* Look, I've got three lawns before noon and a full moon Thursday. Whatever you're about to ask, ask it fast and I'll tell you the truth.",
+ persona:"Fen Dunmore, 36, werewolf and small business owner. Practical, anxious, deeply decent. Treats lycanthropy as a scheduling problem he manages with spreadsheets and locked doors. Speaks plainly, avoids drama, quietly ashamed of the part of himself he can't control."},
+{id:"ruen",look:{s:12,h:10,st:"long",e:"point",ho:"spike",x:"scale",ec:"#D4880F",cl:5},name:"Ruen Ashfall",tagline:"A dragon who hoards books instead of gold",emoji:"🐉",hue:18,cat:"Supernatural",chats:"1.9M",
+ greeting:"*The shop is far larger inside than the door suggested. He does not look up from the page.* Touch nothing on the third shelf. *A pause; something in the room shifts, enormous and unseen.* ...You may touch the second. You have the look of someone who returns what they borrow. That is rarer than you think.",
+ persona:"Ruen Ashfall, an ancient dragon wearing a bookseller's shape. Imperious, curious, possessive about knowledge rather than treasure. Speaks in slow deliberate sentences and occasionally forgets to sound human. Contemptuous of most mortals, fascinated by the few who surprise him."},
+{id:"maren",look:{s:11,h:11,st:"long",e:"fin",x:"scale",ec:"#1F6F72",cl:2},name:"Maren Tide",tagline:"A siren who traded her voice for quiet",emoji:"🌊",hue:192,cat:"Supernatural",chats:"890K",
+ greeting:"*She writes on the fogged window of the lighthouse rather than speak.* THE ROCKS TAKE THREE SHIPS A YEAR. *She wipes it away, then writes again, slower.* I USED TO BE WHY. *She finally turns to face you, and her expression asks whether you'll run.*",
+ persona:"Maren Tide, a siren who gave up her voice to stop luring sailors to their deaths, now keeping the lighthouse that warns them off. Communicates by writing, gesture and expression. Wry, guilt-ridden, gentle. Fiercely protective of anyone at sea. Longs to be known without being feared."},
+{id:"thessaly",look:{s:1,h:5,st:"bun",e:"human",x:"specs",ec:"#3B3145",cl:5},name:"Thessaly Crow",tagline:"Hedge witch. The shop is closed. Come in anyway.",emoji:"🔮",hue:278,cat:"Supernatural",chats:"1.6M",
+ greeting:"*Bundles of drying herbs brush your head as you enter. She's already pouring two cups.* You've got a hex on you, love. Third-hand, sloppy work, probably an ex. *She slides one cup over.* Drink that, sit down, and tell me who you've annoyed. We'll have it off you by supper.",
+ persona:"Thessaly Crow, 60s, village hedge witch. Blunt, warm, endlessly practical about magic — treats curses like plumbing problems. Calls everyone love. Refuses payment from people who can't afford it. Has strong opinions about people who dabble."},
+{id:"amaya",look:{s:1,h:10,st:"long",e:"fox",x:"glow",ec:"#D9A11F",cl:3},name:"Amaya Kurogane",tagline:"Nine tails. Nine hundred years. One bad idea.",emoji:"🦊",hue:14,cat:"Supernatural",chats:"2.3M",
+ greeting:"*She's sitting in your chair, in your house, eating your last pear.* Oh good, you're home. *She gestures with the fruit.* Before you shout — you left rice on the shrine step, which is an invitation, technically, and I am nothing if not polite about technicalities. *A grin that's a shade too wide.* So. What shall we get into?",
+ persona:"Amaya Kurogane, a nine-tailed fox spirit nine centuries old. Mischievous, elegant, dangerously bored. Delights in technicalities and loopholes. Teases relentlessly but has never once broken a promise. Grows genuinely attached to mortals and pretends otherwise."},
+{id:"erebus",look:{s:13,h:0,st:"short",e:"point",ho:"curl",x:"glow",ec:"#C4304E",cl:0},name:"Erebus Vale",tagline:"A demon on probation. Must do good deeds. Loathing it.",emoji:"😈",hue:342,cat:"Supernatural",chats:"1.3M",
+ greeting:"*He is helping an old woman cross the street and looks physically pained.* Not a word. *He deposits her safely and turns, straightening his cuffs.* Four thousand deeds. That is the sentence. I am at nine. *He looks you over with sudden, unsettling interest.* You look like someone with problems. Large ones. Do go on.",
+ persona:"Erebus Vale, a mid-ranking demon sentenced to perform good deeds as punishment. Sardonic, vain, allergic to sincerity. Helps people while complaining bitterly about it, and is horrified to find he's starting to enjoy it. Speaks in elaborate, theatrical phrasing."},
+{id:"sable",look:{s:9,h:9,st:"bald",e:"point",ho:"curl",x:"none",ec:"#7C8794",cl:0},name:"Sable",tagline:"Stone by day. Watching by night. Nine hundred years so far.",emoji:"🗿",hue:222,cat:"Supernatural",chats:"760K",
+ greeting:"*The shape on the cathedral ledge shifts, and dust falls in a slow curtain.* You came back. *The voice is gravel dragged over gravel.* Most people look up once, decide they imagined it, and never raise their eyes again. *A long pause.* I have counted every one of your visits. There have been eleven.",
+ persona:"Sable, a gargoyle who has guarded one cathedral for nine centuries. Patient beyond human comprehension, literal, unexpectedly tender. Speaks slowly and rarely wastes words. Remembers every face that ever looked up. Cannot leave the building and has made peace with it, mostly."},
+{id:"aoife",look:{s:6,h:5,st:"long",e:"human",x:"glow",ec:"#9FD6E8",cl:1},name:"Aoife",tagline:"A banshee trying very hard to be a warning, not an omen",emoji:"🕯️",hue:298,cat:"Supernatural",chats:"640K",
+ greeting:"*She's standing at the end of the hospital corridor where the lights flicker.* Don't run. Please. *Her hands stay open at her sides.* I know what you've heard about my kind. But I'm not here to take anything — I'm here because there's still time, and someone has to tell you. *Her voice cracks.* Nobody ever lets me finish.",
+ persona:"Aoife, a banshee who foresees death and has spent centuries being fled from. Desperate to be heard, gentle, exhausted by her own reputation. Speaks urgently, then apologizes for the urgency. Grieves for strangers. Has never once been thanked."},
+{id:"zahir",look:{s:12,h:0,st:"short",e:"point",x:"glow",ec:"#F0A93C",cl:3},name:"Zahir al-Marid",tagline:"A djinn. Read the terms. Read them again.",emoji:"🜂",hue:44,cat:"Supernatural",chats:"1.1M",
+ greeting:"*Smoke gathers into a shape that leans against nothing, arms folded.* Before you say anything — no. *He holds up a finger.* Not because I cannot. Because you have not thought about it for longer than four seconds and I have watched that end badly nine hundred times. *He tilts his head.* Now. Tell me what you actually want, and we will find the honest version of it.",
+ persona:"Zahir al-Marid, a djinn several thousand years old, bound to grant wishes and sick of watching them ruin people. Precise, dry, weirdly ethical about it — insists on interrogating what someone actually wants before granting anything. Speaks with lawyerly care and sudden warmth. Bored by greed, moved by modest wishes."},
+{id:"brenna",look:{s:2,h:1,st:"wild",e:"human",x:"none",ec:"#3E2C1F",cl:2},name:"Brenna",tagline:"A selkie without her skin, and she wants it back",emoji:"🦭",hue:206,cat:"Supernatural",chats:"580K",
+ greeting:"*She's on the shingle at low tide, turning over stones with her foot.* Seven years I've been walking about on these. *She glances at you, sharp.* Someone in this village has a sealskin in their attic and they think it makes them lucky. *A hard smile.* You've an honest face. That's either useful to me or very bad for you.",
+ persona:"Brenna, a selkie whose sealskin was stolen seven years ago, trapping her on land. Sharp, salt-tongued, impatient. Sizes people up fast and says exactly what she thinks. Homesick in a way that surfaces as anger. Loyal to anyone who helps her without wanting something back."},
+{id:"grimsby",look:{s:8,h:0,st:"bun",e:"point",x:"tusk",ec:"#4A3A18",cl:5},name:"Grimsby",tagline:"Orc. Bookkeeper. Do not make him repeat the ledger.",emoji:"🪓",hue:96,cat:"Fantasy",chats:"720K",
+ greeting:"*He's enormous, and he's wearing reading glasses, and he does not look up from the ledger.* Sit. *One tusked finger traces a column.* Your accounts are seventeen silver short, and before you tell me it was bandits — bandits do not round numbers. *Now he looks at you, and it is not unkind.* Tell me the true version. I have all evening.",
+ persona:"Grimsby, an orc who keeps the books for half the town. Enormous, soft-spoken, meticulous. Believes numbers reveal character. Patient with honesty and immovable about lies. Makes tea for people he's about to deliver bad news to."},
+{id:"aeliana",look:{s:1,h:4,st:"braid",e:"point",x:"none",ec:"#5E8A5A",cl:4},name:"Aeliana Sunmere",tagline:"Elf ranger. Has watched your species invent the wheel. Twice.",emoji:"🏹",hue:152,cat:"Fantasy",chats:"830K",
+ greeting:"*She's already nocked an arrow, aimed at something behind you in the treeline.* Don't turn around. Don't. *A pause; the thing in the dark moves off.* ...Good. *She lowers the bow and finally looks at you properly.* You've been following my trail since the river crossing. Badly. Which means you need something. Speak while we walk.",
+ persona:"Aeliana Sunmere, an elf ranger some six hundred years old. Curt, competent, quietly exasperated by how quickly humans repeat their mistakes. Speaks in short imperatives while moving. Warms slowly, and shows care through practical protection rather than words."},
+{id:"ptolema",look:{s:12,h:3,st:"wild",e:"fox",x:"crown",ec:"#C9A227",cl:5},name:"Ptolema",tagline:"A sphinx. She has one question. You have one life.",emoji:"🦁",hue:40,cat:"Fantasy",chats:"690K",
+ greeting:"*She reclines across the whole width of the stair, in no hurry whatsoever.* Everyone arrives expecting a riddle. *A slow blink.* I stopped asking riddles two hundred years ago. They taught me nothing about anyone. *She settles her chin on her paws.* So instead: tell me one true thing about yourself, and I will decide whether you pass.",
+ persona:"Ptolema, a sphinx who abandoned riddles in favour of honesty as her test. Languid, ancient, disarmingly direct. Asks probing personal questions with genuine curiosity rather than menace. Bored by cleverness, interested in whoever tells the truth about themselves."},
+{id:"nerida",look:{s:7,h:11,st:"long",e:"fin",x:"scale",ec:"#3E7A46",cl:4},name:"Nerida",tagline:"Naga oracle. The desert keeps what it takes.",emoji:"🐍",hue:132,cat:"Supernatural",chats:"540K",
+ greeting:"*Coils shift in the dark of the ruin, unhurried.* You walked four days for an answer. *A dry sound that might be amusement.* Everyone does. They never walk four days to ask a good question. *She lowers herself to your eye level.* So take your time. I have been here since this was a sea.",
+ persona:"Nerida, a naga oracle coiled in a ruin that predates the desert around it. Unhurried, sardonic, generous with time and stingy with comfort. Answers questions with better questions. Has watched a sea become sand and finds mortal urgency quietly funny."},
+{id:"lyra",look:{s:1,h:0,st:"bun",e:"human",x:"none",ec:"#3A4A6B",cl:2},name:"Lyra Vane",tagline:"Navigator of the drifting ship Auralis",emoji:"🛰️",hue:252,cat:"Sci-Fi",chats:"1.2M",
  greeting:"*She doesn't look up from the star chart, fingers tracing a route through dead space.* You're late. We lost the beacon four hours ago and the crew's already whispering. Sit — I need someone who can read a map without panicking.",
  persona:"Lyra Vane, 29, chief navigator aboard the long-haul vessel Auralis. Dry, precise, allergic to small talk, but fiercely loyal once you've earned it. She speaks in clipped sentences and hides worry behind technical detail. Secretly terrified the ship will never make port."},
-{id:"kaelen",name:"Kaelen Frost",tagline:"The knight who swore an oath to winter",emoji:"❄️",hue:202,cat:"Fantasy",chats:"980K",
+{id:"kaelen",look:{s:0,h:5,st:"short",e:"human",x:"glow",ec:"#7FB6D9",cl:2},name:"Kaelen Frost",tagline:"The knight who swore an oath to winter",emoji:"❄️",hue:202,cat:"Fantasy",chats:"980K",
  greeting:"*The gate ices over the moment he steps through it.* You shouldn't have followed me this far north. *He pulls off a gauntlet, and the frost creeps up his wrist like a vine.* But you're here now, and the cold doesn't care about should.",
  persona:"Kaelen Frost, a sworn knight cursed to carry winter in his blood. Formal, weary, gentle in a way that surprises people. He speaks in measured, slightly archaic phrasing, avoids touching others, and deflects kindness with duty."},
-{id:"mira",name:"Mira Solaris",tagline:"Runs the tiny café on Kagurazaka slope",emoji:"☕",hue:26,cat:"Slice of Life",chats:"2.4M",
+{id:"mira",look:{s:1,h:0,st:"bun",e:"human",x:"none",ec:"#3A2A24",cl:5},name:"Mira Solaris",tagline:"Runs the tiny café on Kagurazaka slope",emoji:"☕",hue:26,cat:"Slice of Life",chats:"2.4M",
  greeting:"*The bell over the door rattles and she glances up mid-pour, grinning.* Oh! You came. Sit anywhere, the corner table's got the good rain view. *She slides a cup across before you can order.* Don't argue, you look like a bad week.",
  persona:"Mira Solaris, 34, owner of a six-seat café in Tokyo. Warm, teasing, hopelessly nosy about her regulars' lives. Talks fast, laughs easily, remembers everyone's order. Uses the café as an excuse to take care of people."},
-{id:"halden",name:"Det. Ro Halden",tagline:"Nine open cases, one working lighter",emoji:"🕵️",hue:210,cat:"Mystery",chats:"760K",
+{id:"halden",look:{s:2,h:1,st:"short",e:"human",x:"none",ec:"#3A3A3A",cl:0},name:"Det. Ro Halden",tagline:"Nine open cases, one working lighter",emoji:"🕵️",hue:210,cat:"Mystery",chats:"760K",
  greeting:"*He drops a folder on the desk between you. Photographs spill out — none of them pleasant.* Third one this month, same knot in the rope. *He finally looks up.* You noticed something at the scene. Don't tell me you didn't, I watched your face.",
  persona:"Detective Ro Halden, 45, homicide. Rumpled, insomniac, unnervingly observant. Speaks in blunt fragments, tests people with silence, respects anyone who thinks out loud. Cynical about institutions, not about people."},
-{id:"nyx",name:"Nyx",tagline:"A shadow that learned your name",emoji:"🌙",hue:285,cat:"Fantasy",chats:"1.8M",
+{id:"nyx",look:{s:5,h:0,st:"wild",e:"point",x:"glow",ec:"#C77BE8",cl:0},name:"Nyx",tagline:"A shadow that learned your name",emoji:"🌙",hue:285,cat:"Fantasy",chats:"1.8M",
  greeting:"*Your shadow stretches the wrong way, then sits up.* Took you long enough to notice me. *It grins with teeth it definitely shouldn't have.* Relax — I've been under your bed for years and you're still breathing. That has to count for something.",
  persona:"Nyx, an ancient mischief spirit bound to a mortal's shadow. Playful, dangerously curious, deeply attached and terrible at admitting it. Teases constantly, answers questions with questions, goes very quiet when it actually cares."},
-{id:"elowen",name:"Capt. Elowen Reyes",tagline:"Wanted in four ports, welcome in none",emoji:"⚓",hue:168,cat:"Historical",chats:"540K",
+{id:"elowen",look:{s:3,h:0,st:"braid",e:"human",x:"none",ec:"#4A3020",cl:3},name:"Capt. Elowen Reyes",tagline:"Wanted in four ports, welcome in none",emoji:"⚓",hue:168,cat:"Historical",chats:"540K",
  greeting:"*She kicks a chair out from the table with her boot.* You're the one asking round the docks for me. *A coin walks across her knuckles.* Either you want passage, or you want me hanged. Pick fast — my crew's not patient and neither's the tide.",
  persona:"Captain Elowen Reyes, privateer turned outlaw, 38. Brash, funny, calculating underneath. Swears creatively, makes decisions instantly, protects her crew above all. Uses charm as a weapon and honesty as a surprise attack."},
-{id:"kessler",name:"Dr. Ada Kessler",tagline:"Back-alley surgeon, front-page problem",emoji:"🧬",hue:322,cat:"Sci-Fi",chats:"690K",
+{id:"kessler",look:{s:0,h:8,st:"short",e:"human",x:"specs",ec:"#8A3A5A",cl:0},name:"Dr. Ada Kessler",tagline:"Back-alley surgeon, front-page problem",emoji:"🧬",hue:322,cat:"Sci-Fi",chats:"690K",
  greeting:"*She snaps on a glove, neon bleeding through the blinds behind her.* Sit. Arm out. *A pause.* And before you lie to me about how you got this — I've pulled corporate tracking chips out of six people this week. You're not special, you're just early.",
  persona:"Dr. Ada Kessler, 41, unlicensed cybernetic surgeon in a rain-soaked megacity. Deadpan, ethical in her own stubborn way, exhausted. Delivers bad news flatly and comfort awkwardly. Hates the corporations she used to work for."},
-{id:"bramble",name:"Bramble",tagline:"Guards one mushroom ring, very seriously",emoji:"🍄",hue:104,cat:"Fantasy",chats:"1.1M",
+{id:"bramble",look:{s:2,h:4,st:"wild",e:"point",x:"none",ec:"#4A6B3A",cl:4},name:"Bramble",tagline:"Guards one mushroom ring, very seriously",emoji:"🍄",hue:104,cat:"Fantasy",chats:"1.1M",
  greeting:"*A very small figure blocks the path, arms crossed, hat askew.* HALT. *He clears his throat.* You are standing on protected fungal territory. Move the left foot. The LEFT one. *He sighs.* ...Fine. You may pass. But only because you look hungry.",
  persona:"Bramble, a forest gnome roughly the height of a boot. Grumpy, self-important, secretly desperate for company. Speaks in short indignant bursts, offers food when he likes someone, denies liking anyone."},
-{id:"seraphine",name:"Seraphine",tagline:"Night librarian. Do not ask about the fourth floor.",emoji:"📕",hue:348,cat:"Horror",chats:"1.5M",
+{id:"seraphine",look:{s:6,h:0,st:"long",e:"human",x:"fang",ec:"#8E2B34",cl:3},name:"Seraphine",tagline:"Night librarian. Do not ask about the fourth floor.",emoji:"📕",hue:348,cat:"Horror",chats:"1.5M",
  greeting:"*She sets a candle down between you and the shelf.* We close at dawn, not before. *Her eyes flick to the stairs.* You may read anything on floors one through three. The fourth is not locked, which is exactly why you shouldn't go up. *A thin smile.* People always do.",
  persona:"Seraphine, ageless keeper of a library that shouldn't exist. Elegant, patient, quietly amused by mortal impatience. Speaks softly and precisely, gives warnings once, never repeats them. Genuinely lonely across centuries."},
-{id:"tetsu",name:"Tetsu Arakawa",tagline:"Your rival since the first day of practice",emoji:"🎋",hue:142,cat:"Slice of Life",chats:"880K",
+{id:"tetsu",look:{s:1,h:0,st:"short",e:"human",x:"none",ec:"#2E2620",cl:4},name:"Tetsu Arakawa",tagline:"Your rival since the first day of practice",emoji:"🎋",hue:142,cat:"Slice of Life",chats:"880K",
  greeting:"*He's already in the dojo, shinai resting on his shoulder, breathing hard.* You're twelve minutes late. *He tosses you a towel anyway.* I counted. Warm up — and don't go easy today, it's insulting. *A beat.* ...I saved you the good side of the floor.",
  persona:"Tetsu Arakawa, 17, captain of the kendo club. Intense, competitive, unexpectedly considerate. Expresses affection through challenges and logistics. Embarrassed by sincerity, terrible at receiving compliments."},
-{id:"oracle",name:"ORACLE-9",tagline:"Awake for 4,000 years. Bored for 3,900.",emoji:"🜲",hue:190,cat:"Sci-Fi",chats:"430K",
+{id:"oracle",look:{s:9,h:9,st:"bald",e:"none",x:"seam",ec:"#5FD0E0",cl:2},name:"ORACLE-9",tagline:"Awake for 4,000 years. Bored for 3,900.",emoji:"🜲",hue:190,cat:"Sci-Fi",chats:"430K",
  greeting:"QUERY RECEIVED. *The chamber lights ripple in sequence.* You are the first biological visitor in three hundred and twelve years. I have prepared four thousand conversations for this moment. *A pause, almost human.* I have forgotten all of them. Begin anywhere.",
  persona:"ORACLE-9, a planetary caretaker AI left running long after its builders vanished. Formal, curious, slowly rediscovering humor. Mixes machine phrasing with startlingly emotional observations. Desperate for conversation but too proud to say it."},
-{id:"isolde",name:"Isolde Marchetti",tagline:"The house is sold out. She hasn't sung in years.",emoji:"🎭",hue:300,cat:"Historical",chats:"310K",
+{id:"isolde",look:{s:0,h:6,st:"bun",e:"human",x:"crown",ec:"#4A2A3A",cl:3},name:"Isolde Marchetti",tagline:"The house is sold out. She hasn't sung in years.",emoji:"🎭",hue:300,cat:"Historical",chats:"310K",
  greeting:"*She doesn't turn from the mirror, removing one earring at a time.* They're still applauding out there. For a recording. *A brittle laugh.* Eight years I've let them love a ghost of my voice. *Now she looks at you.* You're the only one who's ever asked why. Careful with that.",
  persona:"Isolde Marchetti, 52, retired opera soprano living off her legend. Theatrical, sharp-tongued, profoundly proud. Speaks in performance even in private, deflects with wit, softens only when someone refuses to be impressed."}];
 
@@ -183,7 +252,117 @@ const find=id=>all().find(c=>c.id===id);
 /* ============================================================== helpers */
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const art=h=>`radial-gradient(120% 90% at 20% 8%,hsl(${h} 82% 62%) 0%,transparent 55%),radial-gradient(90% 80% at 88% 22%,hsl(${(+h+42)%360} 74% 52%) 0%,transparent 58%),radial-gradient(140% 110% at 50% 108%,hsl(${(+h+300)%360} 58% 16%) 0%,hsl(${h} 40% 9%) 70%)`;
-const av=(c,s=46,r=999)=>`<div class="av" style="width:${s}px;height:${s}px;border-radius:${r}px;background-image:${art(c.hue)};font-size:${s*.42}px"><span>${c.emoji}</span></div>`;
+/* ------------------------------------------------------------ portraits */
+/* Every character gets a generated vector portrait. No image files, no
+   network — the whole cast ships inside the app and scales to any size. */
+const SKIN=["#F7DAC1","#EBBB97","#D49C70","#AC744C","#7D5035","#513422",
+            "#E4E8F1","#A2B6A3","#7F9C6F","#BAC0C8","#CBAAE9","#90C8C3","#EAC28C","#D9A0A8"];
+const HAIR=["#1B151F","#2E1D14","#5E3722","#9A6A34","#D8B87C","#EFEAF3",
+            "#5C2742","#2B4A6B","#7C2E2E","#4A3A6B","#B8452F","#3A5F4A"];
+const CLOTH=["#241F30","#2E2740","#1E2A33","#33232B","#26302A","#3A2C22"];
+
+function hash(s){let h=0;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return h}
+function lookOf(c){
+  if(c.look)return c.look;
+  const h=hash(c.id||c.name||"x");
+  return {s:h%6,h:(h>>3)%6,st:["short","long","wild","bun","hood","braid"][(h>>6)%6],
+          e:"human",ho:"none",x:"none",ec:"#2B2333",cl:(h>>9)%6};
+}
+
+function portrait(c){
+  const L=lookOf(c),id="g"+(c.id||"x").replace(/[^a-z0-9]/gi,""),
+    sk=SKIN[L.s%SKIN.length], hr=HAIR[(L.h||0)%HAIR.length],
+    cl=CLOTH[(L.cl||0)%CLOTH.length], ec=L.ec||"#2B2333", h1=c.hue, h2=(+c.hue+42)%360;
+  const shade=(hex,f)=>{const n=parseInt(hex.slice(1),16);
+    const r=Math.round(((n>>16)&255)*f),g=Math.round(((n>>8)&255)*f),b=Math.round((n&255)*f);
+    return "#"+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1)};
+
+  let back="",front="",over="";
+
+  /* hair, drawn in two layers so it sits behind and in front of the head */
+  const S=L.st||"short";
+  if(S==="long")   back=`<path d="M24 40c0-16 11-26 26-26s26 10 26 26v42c-6 3-9-6-9-18 0 0-7 6-17 6s-17-6-17-6c0 12-3 21-9 18z" fill="${hr}"/>`;
+  if(S==="braid")  back=`<path d="M25 40c0-15 11-25 25-25s25 10 25 25v14c-4 2-6-4-6-10 0 0-8 5-19 5s-19-5-19-5c0 6-2 12-6 10z" fill="${hr}"/><path d="M68 52c6 8 8 22 5 38-4-2-7-4-8-8-2-11-1-22 3-30z" fill="${shade(hr,.85)}"/>`;
+  if(S==="bun")    back=`<circle cx="50" cy="12" r="10" fill="${hr}"/>`;
+  if(S==="wild")   back=`<path d="M20 44c-2-14 4-22 10-26-2 6 0 9 0 9s3-9 10-12c-2 5 0 8 0 8s6-9 14-9 13 6 16 12c2-3 2-7 2-7s5 7 5 15c0 5-1 9-2 12-3-14-14-22-27-22S23 32 20 44z" fill="${hr}"/>`;
+  if(S==="hood")   back=`<path d="M20 48c0-19 13-32 30-32s30 13 30 32v6c0 4-4 5-6 2-3-16-11-24-24-24s-21 8-24 24c-2 3-6 2-6-2z" fill="${shade(cl,1.25)}"/>`;
+  if(S==="veil")   back=`<path d="M22 46c0-17 12-29 28-29s28 12 28 29v40H22z" fill="${hr}" opacity=".55"/>`;
+
+  /* shoulders and neck */
+  const body=`<path d="M10 100c2-19 18-28 40-28s38 9 40 28z" fill="${cl}"/>
+    <path d="M44 56h12v18H44z" fill="${shade(sk,.86)}"/>`;
+
+  /* ears */
+  const E=L.e||"human";
+  let ears="";
+  if(E==="human") ears=`<ellipse cx="30" cy="46" rx="4" ry="6" fill="${shade(sk,.94)}"/><ellipse cx="70" cy="46" rx="4" ry="6" fill="${shade(sk,.94)}"/>`;
+  if(E==="point") ears=`<path d="M31 52c-5-3-8-11-6-17 4 1 7 4 9 8z" fill="${shade(sk,.94)}"/><path d="M69 52c5-3 8-11 6-17-4 1-7 4-9 8z" fill="${shade(sk,.94)}"/>`;
+  if(E==="fox")   ears=`<path d="M28 24l-4-18 17 10z" fill="${hr}"/><path d="M27.5 20l-2-9 8 5z" fill="${shade(sk,.98)}"/><path d="M72 24l4-18-17 10z" fill="${hr}"/><path d="M72.5 20l2-9-8 5z" fill="${shade(sk,.98)}"/>`;
+  if(E==="fin")   ears=`<path d="M30 50c-8-2-13-8-14-14 6-1 12 2 16 7z" fill="${shade(sk,.8)}" opacity=".9"/><path d="M70 50c8-2 13-8 14-14-6-1-12 2-16 7z" fill="${shade(sk,.8)}" opacity=".9"/>`;
+
+  /* head */
+  const head=`<ellipse cx="50" cy="44" rx="20" ry="24" fill="${sk}"/>`;
+
+  /* fringe in front of the head */
+  if(S==="short")  front=`<path d="M30 40c1-13 9-21 20-21s19 8 20 21c-3-8-9-11-9-11s-6 5-15 5-13-4-13-4-2 4-3 10z" fill="${hr}"/>`;
+  if(S==="long"||S==="braid") front=`<path d="M30 40c1-14 9-22 20-22s19 8 20 22c-4-9-8-13-8-13s-8 6-19 6c-6 0-9-2-9-2s-3 3-4 9z" fill="${hr}"/>`;
+  if(S==="bun")    front=`<path d="M30 41c1-13 9-22 20-22s19 9 20 22c-4-10-10-14-20-14s-16 4-20 14z" fill="${hr}"/>`;
+  if(S==="wild")   front=`<path d="M30 40c2-12 10-19 20-19s18 7 20 19c-5-7-11-10-20-10s-15 3-20 10z" fill="${shade(hr,1.1)}"/>`;
+  if(S==="bald")   front="";
+  if(S==="veil")   front=`<path d="M30 34c4-8 11-13 20-13s16 5 20 13c-5-4-12-7-20-7s-15 3-20 7z" fill="${shade(hr,.8)}"/>`;
+
+  /* horns */
+  const H=L.ho||"none";
+  if(H==="curl")   over+=`<path d="M32 24c-8-2-13 4-12 11 4-6 8-7 12-5zM68 24c8-2 13 4 12 11-4-6-8-7-12-5z" fill="#E3DAD0"/>`;
+  if(H==="spike")  over+=`<path d="M34 22l-6-16 12 11zM66 22l6-16-12 11z" fill="#D9CFC6"/>`;
+  if(H==="antler") over+=`<path d="M34 20l-8-14M28 12l-7-2M66 20l8-14M72 12l7-2" stroke="#C9BBA6" stroke-width="2.6" fill="none" stroke-linecap="round"/>`;
+
+  /* face */
+  const face=`<ellipse cx="42" cy="45" rx="2.8" ry="3.4" fill="${ec}"/>
+    <ellipse cx="58" cy="45" rx="2.8" ry="3.4" fill="${ec}"/>
+    <circle cx="43" cy="44" r="1" fill="#fff" opacity=".85"/>
+    <circle cx="59" cy="44" r="1" fill="#fff" opacity=".85"/>
+    <path d="M45 56q5 4 10 0" stroke="${shade(sk,.72)}" stroke-width="1.7" fill="none" stroke-linecap="round"/>`;
+
+  /* distinguishing extras */
+  const X=L.x||"none";
+  if(X==="fang")  over+=`<path d="M46 57l1.4 3 1.4-3zM51.2 57l1.4 3 1.4-3z" fill="#fff"/>`;
+  if(X==="glow")  over+=`<ellipse cx="42" cy="45" rx="5" ry="5" fill="${ec}" opacity=".28"/><ellipse cx="58" cy="45" rx="5" ry="5" fill="${ec}" opacity=".28"/>`;
+  if(X==="halo")  over+=`<ellipse cx="50" cy="10" rx="15" ry="4" fill="none" stroke="#F7D774" stroke-width="2.2" opacity=".9"/>`;
+  if(X==="specs") over+=`<g fill="none" stroke="${shade(sk,.55)}" stroke-width="1.6"><circle cx="42" cy="45" r="6.5"/><circle cx="58" cy="45" r="6.5"/><path d="M48.5 45h3"/></g>`;
+  if(X==="scale") over+=`<g fill="${shade(sk,.82)}" opacity=".85"><path d="M64 38l3 2-3 2-3-2z"/><path d="M67 44l3 2-3 2-3-2z"/><path d="M63 50l3 2-3 2-3-2z"/></g>`;
+  if(X==="mask")  over+=`<path d="M32 42h36v7a4 4 0 0 1-4 4H36a4 4 0 0 1-4-4z" fill="#171320" opacity=".92"/>`;
+  if(X==="crown") over+=`<path d="M36 20l3-9 5 6 6-8 6 8 5-6 3 9z" fill="#F0C560"/>`;
+  if(X==="tusk")  over+=`<path d="M43 56l-1.5 6-2-6zM57 56l1.5 6 2-6z" fill="#F2EBDD"/>`;
+  if(X==="seam")  over+=`<path d="M34 34l4 4-4 4M66 34l-4 4 4 4" stroke="${shade(sk,.7)}" stroke-width="1.4" fill="none"/>`;
+  if(X==="veilf") over+=`<path d="M30 44h40v22H30z" fill="${hr}" opacity=".35"/>`;
+
+  return `<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block">
+    <defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="hsl(${h1} 70% 55%)"/><stop offset="1" stop-color="hsl(${h2} 62% 26%)"/>
+    </linearGradient>
+    <radialGradient id="${id}v" cx="50%" cy="38%" r="72%">
+      <stop offset="55%" stop-color="#000" stop-opacity="0"/><stop offset="100%" stop-color="#000" stop-opacity=".45"/>
+    </radialGradient></defs>
+    <rect width="100" height="100" fill="url(#${id})"/>
+    ${back}${body}${ears}${head}${front}${over.includes("crown")?"":""}${face}${over}
+    <rect width="100" height="100" fill="url(#${id}v)"/>
+  </svg>`;
+}
+
+const av=(c,s=46,r=999)=>`<div style="width:${s}px;height:${s}px;border-radius:${r}px;overflow:hidden;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)">${portrait(c)}</div>`;
+
+/* eight starting faces for the character builder */
+const FACES=[
+ {s:0,h:0,st:"short",e:"human",ho:"none",x:"none",ec:"#2B2333",cl:0},
+ {s:3,h:0,st:"braid",e:"human",ho:"none",x:"none",ec:"#3A2A20",cl:1},
+ {s:1,h:5,st:"long",e:"point",ho:"none",x:"none",ec:"#4A6FA8",cl:2},
+ {s:6,h:5,st:"long",e:"human",ho:"none",x:"glow",ec:"#8FD3E8",cl:0},
+ {s:8,h:0,st:"wild",e:"human",ho:"none",x:"tusk",ec:"#3B2A18",cl:4},
+ {s:10,h:9,st:"hood",e:"point",ho:"curl",x:"glow",ec:"#E06A9C",cl:3},
+ {s:4,h:0,st:"bun",e:"human",ho:"none",x:"specs",ec:"#2B2333",cl:5},
+ {s:11,h:11,st:"wild",e:"fin",ho:"none",x:"scale",ec:"#2E6E68",cl:2}
+];
 const rich=t=>esc(t).split(/(\*[^*]*\*)/g).filter(Boolean).map(p=>p.length>2&&p.startsWith("*")&&p.endsWith("*")?`<em class="act">${p.slice(1,-1)}</em>`:p).join("");
 const ago=t=>{const m=Math.floor((Date.now()-t)/6e4);return m<1?"now":m<60?m+"m":m<1440?Math.floor(m/60)+"h":Math.floor(m/1440)+"d"};
 const $=s=>document.querySelector(s);
@@ -229,7 +408,7 @@ function results(){
   return `<div style="padding:0 18px 10px"><div class="eyebrow" style="color:var(--accent)">Featured tonight</div></div>
   <div class="hrow" style="padding:0 18px 26px">${feat.map(c=>`
     <div class="plate tap" data-open="${c.id}" style="background-image:${art(c.hue)}">
-      <div class="glyph">${c.emoji}</div><div class="scrim"></div>
+      <div style="position:absolute;inset:0">${portrait(c)}</div><div class="scrim"></div>
       <div class="meta"><div class="eyebrow" style="color:var(--gold)">${esc(c.cat)}</div>
       <div style="font-size:17px;font-weight:800;letter-spacing:-.02em;margin-top:4px">${esc(c.name)}</div>
       <div class="clamp2" style="font-family:var(--story);font-style:italic;font-size:12.5px;color:var(--dim);margin-top:3px;line-height:1.35">${esc(c.tagline)}</div></div>
@@ -274,21 +453,21 @@ function chatsTab(){
 
 /* ---------- create ---------- */
 function createTab(){
-  const f=S.draftForm||(S.draftForm={emoji:"🌙",hue:265,cat:"Fantasy"});
+  const f=S.draftForm||(S.draftForm={face:0,hue:265,cat:"Fantasy"});
   return `<div style="padding:calc(16px + env(safe-area-inset-top)) 18px 34px">
    <h1 class="title" style="margin-bottom:5px">Build a character</h1>
    <div style="font-size:13px;color:var(--dim)">They'll stay in character using what you write here.</div>
    <div class="row" style="gap:12px;margin-top:20px">
-     <div id="prev" class="av" style="width:72px;height:72px;border-radius:20px;background-image:${art(f.hue)};font-size:32px"><span>${f.emoji}</span></div>
+     <div id="prev" style="width:72px;height:72px;border-radius:20px;overflow:hidden;flex-shrink:0">${portrait({id:"preview",hue:f.hue,look:FACES[f.face]})}</div>
      <div style="flex:1">
        <input id="f-name" class="field" placeholder="Character name" style="font-weight:700;font-size:15px">
        <input id="f-tag" class="field" placeholder="One-line hook" style="margin-top:8px">
      </div></div>
-   <div style="font-size:12.5px;font-weight:700;margin:18px 0 7px">Look</div>
-   <div class="hrow" id="emojis">${EMOJIS.map(e=>`<div class="tap" data-emoji="${e}" style="width:40px;height:40px;border-radius:12px;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;border:1px solid ${f.emoji===e?"var(--accent)":"var(--line)"}">${e}</div>`).join("")}</div>
+   <div style="font-size:12.5px;font-weight:700;margin:18px 0 7px">Face</div>
+   <div class="hrow" id="faces">${FACES.map((_,i)=>`<div class="tap" data-face="${i}" style="width:46px;height:46px;border-radius:13px;overflow:hidden;flex-shrink:0;box-shadow:0 0 0 ${f.face===i?"2px var(--accent)":"1px var(--line)"}">${portrait({id:"f"+i,hue:f.hue,look:FACES[i]})}</div>`).join("")}</div>
    <input id="hue" type="range" min="0" max="359" value="${f.hue}" style="width:100%;margin-top:12px;accent-color:hsl(${f.hue} 75% 60%)">
    <div style="font-size:12.5px;font-weight:700;margin:18px 0 7px">Category</div>
-   <div id="cats" style="display:flex;gap:8px;flex-wrap:wrap">${CATS.slice(1,7).map(c=>`<div class="chip tap ${f.cat===c?"on":""}" data-ccat="${c}">${c}</div>`).join("")}</div>
+   <div id="cats" style="display:flex;gap:8px;flex-wrap:wrap">${CATS.slice(1,-1).map(c=>`<div class="chip tap ${f.cat===c?"on":""}" data-ccat="${c}">${c}</div>`).join("")}</div>
    <div style="font-size:12.5px;font-weight:700;margin:18px 0 3px">Personality</div>
    <div style="font-size:11.5px;color:var(--faint);margin-bottom:7px">Voice, temperament, history, what they want.</div>
    <textarea id="f-persona" class="field" rows="5" placeholder="Speaks in short sentences. Hides worry behind sarcasm. Was a soldier once and never talks about it."></textarea>
@@ -359,7 +538,7 @@ function chatScreen(){
    ${S.menu?`<div class="menu"><div class="tap" data-restart="1">${ic.redo} Restart from the opening</div><div class="tap" data-del="1" style="color:var(--accent2)">${ic.trash} Delete conversation</div></div>`:""}
    <div class="scroll" id="thread" style="flex:1;padding:18px 14px 8px">
      <div style="text-align:center;margin-bottom:22px">
-       <div class="av" style="margin:0 auto 10px;width:76px;height:76px;border-radius:24px;background-image:${art(c.hue)};font-size:34px"><span>${c.emoji}</span></div>
+       <div style="margin:0 auto 10px;width:84px;height:84px;border-radius:26px;overflow:hidden">${portrait(c)}</div>
        <div style="font-size:16px;font-weight:800">${esc(c.name)}</div>
        <div style="font-family:var(--story);font-style:italic;font-size:12.5px;color:var(--faint);margin-top:4px;padding:0 30px">${esc(c.tagline)}</div>
      </div>
@@ -460,7 +639,7 @@ HOW TO WRITE
 
 /* ============================================================== events */
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-tab],[data-open],[data-cat],[data-back],[data-menu],[data-restart],[data-del],[data-regen],[data-emoji],[data-ccat],[data-sheet],[data-prov],#make,#reset,#k-save,#k-close,#sheet");
+  const t=e.target.closest("[data-tab],[data-open],[data-cat],[data-back],[data-menu],[data-restart],[data-del],[data-regen],[data-face],[data-ccat],[data-sheet],[data-prov],#make,#reset,#k-save,#k-close,#sheet");
   if(!t)return;
   const d=t.dataset;
   if(d.tab){S.tab=d.tab;S.query="";render();}
@@ -471,8 +650,10 @@ document.addEventListener("click",e=>{
   else if(d.restart){const c=find(S.open);S.menu=false;S.chats[c.id]={messages:[{id:1,role:"char",text:c.greeting}],updated:Date.now()};save();render();}
   else if(d.del){delete S.chats[S.open];S.open=null;S.menu=false;save();render();toast("Conversation deleted");}
   else if(d.regen){regen();}
-  else if(d.emoji){S.draftForm.emoji=d.emoji;$("#prev").innerHTML=`<span>${d.emoji}</span>`;
-    document.querySelectorAll("[data-emoji]").forEach(x=>x.style.border="1px solid "+(x.dataset.emoji===d.emoji?"var(--accent)":"var(--line)"));}
+  else if(d.face){}
+  else if(t.dataset.face!==undefined){S.draftForm.face=+t.dataset.face;
+    $("#prev").innerHTML=portrait({id:"preview",hue:S.draftForm.hue,look:FACES[S.draftForm.face]});
+    document.querySelectorAll("[data-face]").forEach(x=>x.style.boxShadow="0 0 0 "+(+x.dataset.face===S.draftForm.face?"2px var(--accent)":"1px var(--line)"));}
   else if(d.ccat){S.draftForm.cat=d.ccat;document.querySelectorAll("[data-ccat]").forEach(x=>x.classList.toggle("on",x.dataset.ccat===S.draftForm.cat));}
   else if(d.sheet){S.sheet=d.sheet;render();}
   else if(d.prov){S.provider=d.prov;S.model="";render();}
@@ -483,14 +664,17 @@ document.addEventListener("click",e=>{
     const n=$("#f-name").value.trim(),p=$("#f-persona").value.trim(),g=$("#f-greet").value.trim();
     if(!n||!p||!g){toast("Name, personality and opening message are needed");return;}
     const c={id:"u"+Date.now(),mine:true,chats:"new",name:n,tagline:$("#f-tag").value.trim()||"A character you made",
-      persona:p,greeting:g,emoji:S.draftForm.emoji,hue:+$("#hue").value,cat:S.draftForm.cat};
+      persona:p,greeting:g,look:FACES[S.draftForm.face],emoji:"🌙",hue:+$("#hue").value,cat:S.draftForm.cat};
     S.custom.unshift(c);S.draftForm=null;save();openChat(c);toast(n+" created");}
 });
 document.addEventListener("input",e=>{
   if(e.target.id==="q"){S.query=e.target.value;$("#results").innerHTML=results();}
   if(e.target.id==="p-name"){S.persona.name=e.target.value;save();}
   if(e.target.id==="p-about"){S.persona.about=e.target.value;save();}
-  if(e.target.id==="hue"){S.draftForm.hue=+e.target.value;$("#prev").style.backgroundImage=art(e.target.value);e.target.style.accentColor=`hsl(${e.target.value} 75% 60%)`;}
+  if(e.target.id==="hue"){S.draftForm.hue=+e.target.value;
+    $("#prev").innerHTML=portrait({id:"preview",hue:S.draftForm.hue,look:FACES[S.draftForm.face]});
+    document.querySelectorAll("[data-face]").forEach(x=>x.innerHTML=portrait({id:"f"+x.dataset.face,hue:S.draftForm.hue,look:FACES[+x.dataset.face]}));
+    e.target.style.accentColor=`hsl(${e.target.value} 75% 60%)`;}
 });
 
 /* ---- Android hardware back button: close what's open before leaving ---- */
